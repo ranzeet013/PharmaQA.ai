@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Query</title>
+    <link rel="stylesheet" href="/static/style.css"> <!-- Link to your CSS -->
+</head>
+<body>
+    <h1>Welcome to FastAPI Query Example</h1>
+    <p>Ask a question:</p>
+
+    <form id="queryForm">
+        <input type="text" id="queryInput" placeholder="Enter your question" required />
+        <button type="submit">Ask</button>
+    </form>
+
+    <div id="responseContainer">
+        <h3>Answer:</h3>
+        <p id="answer"></p>
+        <h4>Sources:</h4>
+        <ul id="sources"></ul>
+    </div>
+
+    <script>
+        document.getElementById("queryForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Get the query input value
+            const query = document.getElementById("queryInput").value;
+
+            // Make a POST request to FastAPI /query endpoint
+            fetch("http://127.0.0.1:5000/query", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ query: query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update the page with the response data
+                document.getElementById("answer").textContent = data.answer;
+                
+                // Clear previous sources and add new ones
+                const sourcesList = document.getElementById("sources");
+                sourcesList.innerHTML = ""; // Clear previous sources
+                data.sources.forEach(source => {
+                    const li = document.createElement("li");
+                    li.textContent = source;
+                    sourcesList.appendChild(li);
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching query:", error);
+                alert("There was an error with your query.");
+            });
+        });
+    </script>
+</body>
+</html>
